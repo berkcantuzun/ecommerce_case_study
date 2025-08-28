@@ -3,7 +3,7 @@
 
 composer install
 
-
+composer dump-autoload
 
 \i migrations/init.sql
 
