@@ -13,5 +13,6 @@ class Response
             'data' => $data,
             'errors' => $errors
         ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 }
