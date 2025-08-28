@@ -3,13 +3,25 @@
 namespace App\Helpers;
 class Request
 {
+    public static function header($key)
+    {
+        $headers = getallheaders();
+        return $headers[$key] ?? null;
+    }
 
     public static function validate($input, $rules, $pdo = null)
     {
         $errors = [];
         foreach ($rules as $field => $rule) {
             $value = $input[$field] ?? null;
-            foreach (explode('|', $rule) as $r) {
+            $ruleParts = explode('|', $rule);
+            $isNullable = in_array('nullable', $ruleParts);
+
+            if ($isNullable && (is_null($value) || $value === '')) {
+                continue;
+            }
+
+            foreach ($ruleParts as $r) {
                 if ($r === 'required' && (is_null($value) || $value === '')) {
                     $errors[$field][] = 'Alan zorunlu';
                 }
@@ -53,12 +65,19 @@ class Request
 
     public static function input()
     {
+
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
         if (stripos($contentType, 'application/json') !== false) {
             $data = json_decode(file_get_contents('php://input'), true);
             return is_array($data) ? $data : [];
         }
-        // Form-data veya query string
+
+        if (in_array($method, ['PUT', 'PATCH'])) {
+            parse_str(file_get_contents('php://input'), $data);
+            return is_array($data) ? $data : [];
+        }
         return array_merge($_GET, $_POST);
     }
 }

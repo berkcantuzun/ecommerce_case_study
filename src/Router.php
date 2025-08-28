@@ -19,7 +19,15 @@ class Router
             UserController::register();
         } else if ($uri === '/api/login' && $method === 'POST') {
             AuthController::login();
-        } else {
+        } else if ($uri === '/api/profile' && $method === 'GET') {
+            UserController::profile();
+        } else if ($uri === '/api/profile' && $method === 'PUT') {
+            UserController::profileUpdate();
+        }
+
+
+
+        else {
             Response::json(false, 'Endpoint bulunamadı', null, [], 404);
         }
     }

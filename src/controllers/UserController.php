@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Database;
+use App\Helpers\Auth;
 use App\Helpers\Request;
 use App\Helpers\Response;
 
@@ -20,7 +21,7 @@ class UserController
                 'password' => 'required|min:8|max:255',
                 'role' => 'in:user,admin'
             ];
-            $errors = Request::validate($input, $rules,$pdo);
+            $errors = Request::validate($input, $rules, $pdo);
             if (!empty($errors)) {
                 Response::json(false, 'Doğrulama hatası', null, $errors, 422);
             }
@@ -40,6 +41,75 @@ class UserController
 
 
         } catch (\Exception $e) {
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+
+    }
+
+    public static function profile()
+    {
+        try {
+            $db = new \App\Database();
+            $pdo = $db->getConnection();
+            $userId = Auth::userId();
+            if (!$userId) {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+                return;
+            }
+            $userModel = new \App\Models\User($pdo);
+            $user = $userModel->getUserById(['id' => $userId]);
+            if (!$user) {
+                Response::json(false, 'Kullanıcı bulunamadı', null, [], 404);
+                return;
+            }
+            Response::json(true, 'Profil bilgisi', $user, [], 200);
+        } catch (\Exception $e) {
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+    }
+
+    public static function profileUpdate()
+    {
+        try {
+            $db = new \App\Database();
+            $pdo = $db->getConnection();
+            $userId = Auth::userId();
+            if (!$userId) {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+            }
+            $input = Request::input();
+            $rules = [
+                'name' => 'nullable|min:2|max:100',
+                'email' => 'nullable|email|unique:users,email|max:150',
+                'password' => 'nullable|min:8|max:255',
+                'role' => 'in:user,admin'
+            ];
+            $errors = Request::validate($input, $rules, $pdo);
+            if (!empty($errors)) {
+                Response::json(false, 'Doğrulama hatası', null, $errors, 422);
+            }
+            $userModel = new \App\Models\User($pdo);
+            $data = ['id' => $userId];
+            if (isset($input['name'])) {
+                $data['name'] = $input['name'];
+            }
+            if (isset($input['email'])) {
+                $data['email'] = $input['email'];
+            }
+            if (!empty($input['password'])) {
+                $data['password'] = password_hash($input['password'], PASSWORD_BCRYPT);
+            }
+            if (isset($input['role'])) {
+                $data['role'] = $input['role'];
+            }
+
+            $result = $userModel->updateUser($data);
+            if (!$result) {
+                Response::json(false, 'Kullanıcı güncellenemedi', $input, [], 500);
+            }
+            Response::json(true, 'Kullanıcı başarıyla güncellendi', null, [], 200);
+
+        }catch (\Exception $e) {
             Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
         }
 
