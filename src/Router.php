@@ -31,7 +31,7 @@ class Router
 
         /* Category Management */
         else if ($uri === '/api/categories' && $method === 'GET') {
-            // CategoryController::list();
+            CategoryController::list();
         } else if ($uri === '/api/categories' && $method === 'POST') {
             CategoryController::create();
         } else if (preg_match('#^/api/categories/(\d+)$#', $uri, $matches) && $method === 'PUT') {

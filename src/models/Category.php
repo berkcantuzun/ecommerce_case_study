@@ -18,4 +18,9 @@ class Category
         $stmt = $this->pdo->prepare("INSERT INTO categories (name, description) VALUES (:name, :description)");
         return $stmt->execute($data);
     }
+    public function getAll()
+    {
+        $stmt = $this->pdo->query("SELECT id, name, description,created_at,updated_at FROM categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
