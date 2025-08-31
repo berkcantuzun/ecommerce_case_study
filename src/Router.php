@@ -35,7 +35,7 @@ class Router
         } else if ($uri === '/api/categories' && $method === 'POST') {
             CategoryController::create();
         } else if (preg_match('#^/api/categories/(\d+)$#', $uri, $matches) && $method === 'PUT') {
-            // CategoryController::update($matches[1]);
+            CategoryController::categoryUpdate($matches[1]);
         } else if (preg_match('#^/api/categories/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
             // CategoryController::delete($matches[1]);
         }
