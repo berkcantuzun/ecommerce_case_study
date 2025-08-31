@@ -100,4 +100,29 @@ class CategoryController{
             Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
         }
     }
+
+    public static function categoryDelete($id){
+        try {
+            $db = new \App\Database();
+            $pdo = $db->getConnection();
+            $userRole = Auth::userRole();
+            if ($userRole != 'admin') {
+
+                Response::json(false, 'Yetkisiz', null, [], 401);
+
+            }
+            $categoryModel = new Category($pdo);
+
+            $result = $categoryModel->delete([
+                'id' => $id
+            ]);
+            if (!$result) {
+                Response::json(false, 'Kategori silinemedi', null, [], 500);
+            }
+            Response::json(true, 'Kategori başarıyla silindi', null, [], 200);
+        }catch (\Exception $e){
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+
+    }
 }

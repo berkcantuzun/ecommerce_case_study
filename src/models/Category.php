@@ -39,4 +39,10 @@ class Category
         $stmt = $this->pdo->prepare("UPDATE categories SET $setClause WHERE id = :id");
         return $stmt->execute($data);
     }
+    public function delete($data)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM categories WHERE id = :id");
+        return $stmt->execute($data);
+    }
+
 }
