@@ -47,14 +47,14 @@ class Request
                     $errors[$field][] = 'Pozitif olmalı';
                 }
                 if (strpos($r, 'unique:') === 0 && $pdo) {
-                    // örnek: unique:users,email
+
                     $parts = explode(':', $r);
                     if (count($parts) == 2) {
                         list($table, $col) = explode(',', $parts[1]);
                         $stmt = $pdo->prepare("SELECT COUNT(*) FROM $table WHERE $col = :value");
                         $stmt->execute(['value' => $value]);
                         if ($stmt->fetchColumn() > 0) {
-                            $errors[$field][] = 'Bu email zaten kayıtlı';
+                            $errors[$field][] = 'Bu veri zaten kayıtlı';
                         }
                     }
                 }

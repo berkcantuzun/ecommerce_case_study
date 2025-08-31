@@ -14,6 +14,7 @@ class Auth {
         $payload = [
             'sub' => $user['id'],
             'email' => $user['email'],
+            'role' => $user['role'],
             'iat' => time(),
             'exp' => time() + 3600
         ];
@@ -31,6 +32,21 @@ class Auth {
             $decoded = JWT::decode($token, new Key(self::$secret, 'HS256'));
             return $decoded->sub ?? null;
         } catch (\Exception $e) {
+            return null;
+        }
+    }
+    public static function userRole(){
+        $authHeader = Request::header('Authorization');
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+
+            return null;
+        }
+        $token = $matches[1];
+        try {
+            $decoded = JWT::decode($token, new Key(self::$secret, 'HS256'));
+            return $decoded->role ?? null;
+        } catch (\Exception $e) {
+
             return null;
         }
     }
