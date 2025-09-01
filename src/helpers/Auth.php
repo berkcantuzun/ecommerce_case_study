@@ -5,7 +5,13 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Helpers\Request;
 class Auth {
-    protected static $secret ='AIzaSyCsh3Z4BE_tGzMHFVZvWwmXTQ0jvuE83cI';
+    protected static $secret;
+    public static function getSecret() {
+        if (!self::$secret) {
+            self::$secret = $_ENV['JWT_SECRET'];
+        }
+        return self::$secret;
+    }
     public static function token($user)
     {
         if (!$user || !isset($user['id'])) {
@@ -19,7 +25,7 @@ class Auth {
             'exp' => time() + 3600
         ];
 
-        return \Firebase\JWT\JWT::encode($payload, self::$secret, 'HS256');
+        return \Firebase\JWT\JWT::encode($payload, self::getSecret(), 'HS256');
     }
     public static function userId()
     {
