@@ -135,4 +135,31 @@ class ProductController
             Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
         }
     }
+
+    public static function productDelete($id)
+    {
+        try {
+            $db = new Database();
+            $pdo = $db->getConnection();
+            $userRole = Auth::userRole();
+            if ($userRole != 'admin') {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+                return;
+            }
+            $productModel = new Product($pdo);
+            $existingProduct = $productModel->getById(['id' => $id]);
+            if (!$existingProduct) {
+                Response::json(false, 'Ürün bulunamadı', null, [], 404);
+                return;
+            }
+            $result = $productModel->delete(['id' => $id]);
+            if (!$result) {
+                Response::json(false, 'Ürün silinemedi', null, [], 500);
+                return;
+            }
+            Response::json(true, 'Ürün başarıyla silindi', null, [], 200);
+        } catch (\Exception $e) {
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+    }
 }

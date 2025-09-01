@@ -52,4 +52,8 @@ class Product
         return $stmt->execute($data);
 
     }
+    public function delete($data){
+        $stmt = $this->pdo->prepare("DELETE FROM products WHERE id = :id");
+        return $stmt->execute($data);
+    }
 }

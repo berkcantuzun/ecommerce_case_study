@@ -52,7 +52,7 @@ class Router
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'PUT') {
             ProductController::productUpdate($matches[1]);
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
-            // ProductController::delete($matches[1]);
+          ProductController::productDelete($matches[1]);
         }
         /* End Product Management */
 
