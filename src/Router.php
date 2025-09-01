@@ -50,7 +50,7 @@ class Router
         } else if ($uri === '/api/products' && $method === 'POST') {
             ProductController::create();
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'PUT') {
-            // ProductController::update($matches[1]);
+            ProductController::productUpdate($matches[1]);
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
             // ProductController::delete($matches[1]);
         }

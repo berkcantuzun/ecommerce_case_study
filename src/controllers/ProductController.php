@@ -58,7 +58,8 @@ class ProductController
         }
     }
 
-    public static function detail($id){
+    public static function detail($id)
+    {
         try {
             $db = new Database();
             $pdo = $db->getConnection();
@@ -74,6 +75,62 @@ class ProductController
                 return;
             }
             Response::json(true, 'Ürün Bulundu', $product, [], 200);
+        } catch (\Exception $e) {
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+    }
+
+    public static function productUpdate($id)
+    {
+        try {
+            $db = new Database();
+            $pdo = $db->getConnection();
+            $userRole = Auth::userRole();
+            if ($userRole != 'admin') {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+                return;
+            }
+            $input = Request::input();
+            $rules = [
+                'name' => 'nullable|min:3|max:100|unique:products,name',
+                'description' => 'nullable|max:255',
+                'price' => 'nullable|numeric|min:1',
+                'stock_quantity' => 'nullable|numeric|min:0',
+                'category_id' => 'nullable|numeric'
+            ];
+            $errors = Request::validate($input, $rules, $pdo);
+            if (!empty($errors)) {
+                Response::json(false, 'Doğrulama hatası', null, $errors, 422);
+                return;
+            }
+            if (isset($input['category_id'])) {
+                $categoryModel = new Category($pdo);
+                $category = $categoryModel->getById(['id' => $input['category_id']]);
+                if (!$category) {
+                    Response::json(false, 'Geçersiz kategori ID', null, [], 422);
+                    return;
+                }
+            }
+            $productModel = new Product($pdo);
+            $existingProduct = $productModel->getById(['id' => $id]);
+            if (!$existingProduct) {
+                Response::json(false, 'Ürün bulunamadı', null, [], 404);
+                return;
+            }
+            $updateData = [
+                'id' => $id,
+                'name' => $input['name'] ?? $existingProduct['name'],
+                'description' => array_key_exists('description', $input) ? $input['description'] : $existingProduct['description'],
+                'price' => $input['price'] ?? $existingProduct['price'],
+                'stock_quantity' => $input['stock_quantity'] ?? $existingProduct['stock_quantity'],
+                'category_id' => $input['category_id'] ?? $existingProduct['category_id']
+            ];
+            $result = $productModel->update($updateData);
+            if (!$result) {
+                Response::json(false, 'Ürün güncellenemedi', null, [], 500);
+                return;
+            }
+            Response::json(true, 'Ürün başarıyla güncellendi', null, [], 200);
         } catch (\Exception $e) {
             Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
         }
