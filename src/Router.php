@@ -4,7 +4,9 @@ namespace App;
 
 
 use App\Controllers\AuthController;
+use App\Controllers\CartController;
 use App\Controllers\CategoryController;
+use App\Controllers\OrderController;
 use App\Controllers\ProductController;
 use App\Controllers\UserController;
 use App\Helpers\Response;
@@ -44,17 +46,33 @@ class Router
 
         /*  Product Management */
         else if ($uri === '/api/products' && $method === 'GET') {
-             ProductController::list();
+            ProductController::list();
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'GET') {
-             ProductController::detail($matches[1]);
+            ProductController::detail($matches[1]);
         } else if ($uri === '/api/products' && $method === 'POST') {
             ProductController::create();
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'PUT') {
             ProductController::productUpdate($matches[1]);
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
-          ProductController::productDelete($matches[1]);
+            ProductController::productDelete($matches[1]);
         }
         /* End Product Management */
+
+        /* Cart Management */
+        elseif ($uri === '/api/cart' && $method === 'GET') {
+            CartController::getCart();
+        } else if ($uri === '/api/cart/add' && $method === 'POST') {
+            CartController::addToCart();
+        } else if ($uri === '/api/cart/update' && $method === 'PUT') {
+            CartController::updateCartItem();
+        } else if (preg_match('#^/api/cart/remove/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
+            CartController::removeCartItem($matches[1]);
+        } else if ($uri === '/api/cart/clear' && $method === 'DELETE') {
+            CartController::clearCart();
+        }
+        /* End Cart Management */
+
+
 
 
         else {
