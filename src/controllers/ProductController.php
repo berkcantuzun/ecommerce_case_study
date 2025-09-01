@@ -58,6 +58,50 @@ class ProductController
         }
     }
 
+    public static function list(){
+        try {
+            $db = new Database();
+            $pdo = $db->getConnection();
+            $userId = Auth::userId();
+            if (!$userId) {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+                return;
+            }
+            $input = Request::input();
+            $page = isset($input['page']) && is_numeric($input['page']) && $input['page'] > 0 ? (int)$input['page'] : 1;
+            $limit = isset($input['limit']) && is_numeric($input['limit']) && $input['limit'] > 0 ? (int)$input['limit'] : 10;
+            $offset = ($page - 1) * $limit;
+
+            $filters = [];
+            if (isset($input['name']) && is_string($input['name'])) {
+                $filters['name'] = trim($input['name']);
+            }
+            if (isset($input['category_id']) && is_numeric($input['category_id'])) {
+                $filters['category_id'] = (int)$input['category_id'];
+            }
+            if (isset($input['min_price']) && is_numeric($input['min_price'])) {
+                $filters['min_price'] = (float)$input['min_price'];
+            }
+            if (isset($input['max_price']) && is_numeric($input['max_price'])) {
+                $filters['max_price'] = (float)$input['max_price'];
+            }
+
+            $productModel = new Product($pdo);
+            $products = $productModel->getAll($filters, $limit, $offset);
+            if (!$products) {
+                Response::json(false, 'Ürünler bulunamadı', null, [], 404);
+                return;
+            }
+            Response::json(true, 'Ürünler bulundu', [
+                'page' => $page,
+                'limit' => $limit,
+                'products' => $products
+            ], [], 200);
+
+        }catch (\Exception $e){
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+    }
     public static function detail($id)
     {
         try {

@@ -92,4 +92,6 @@ class Request
         }
         return array_merge($_GET, $_POST);
     }
+
+
 }

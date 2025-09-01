@@ -56,4 +56,43 @@ class Product
         $stmt = $this->pdo->prepare("DELETE FROM products WHERE id = :id");
         return $stmt->execute($data);
     }
+    public function getAll($filters, $limit, $offset)
+    {
+        $sql = "SELECT id, name, description, price, stock_quantity, category_id, created_at, updated_at FROM products WHERE 1=1";
+        $params = [];
+
+        if (isset($filters['name'])) {
+            $sql .= " AND name LIKE :name";
+            $params['name'] = '%' . $filters['name'] . '%';
+        }
+        if (isset($filters['category_id'])) {
+            $sql .= " AND category_id = :category_id";
+            $params['category_id'] = $filters['category_id'];
+        }
+        if (isset($filters['min_price'])) {
+            $sql .= " AND price >= :min_price";
+            $params['min_price'] = $filters['min_price'];
+        }
+        if (isset($filters['max_price'])) {
+            $sql .= " AND price <= :max_price";
+            $params['max_price'] = $filters['max_price'];
+        }
+
+        $sql .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $params['limit'] = (int)$limit;
+        $params['offset'] = (int)$offset;
+
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            if ($key === 'limit' || $key === 'offset') {
+                $stmt->bindValue(':' . $key, $value, \PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':' . $key, $value);
+            }
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
