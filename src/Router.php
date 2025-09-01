@@ -72,7 +72,16 @@ class Router
         }
         /* End Cart Management */
 
+        /* Order Management */
 
+        else if ($uri === '/api/orders' && $method === 'POST') {
+            OrderController::createOrder();
+        } else if ($uri === '/api/orders' && $method === 'GET') {
+            OrderController::getOrders();
+        } else if (preg_match('#^/api/orders/(\d+)$#', $uri, $matches) && $method === 'GET') {
+            OrderController::getOrderDetail($matches[1]);
+        }
+        /* End Order Management */
 
 
         else {
