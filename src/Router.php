@@ -46,7 +46,7 @@ class Router
         else if ($uri === '/api/products' && $method === 'GET') {
             // ProductController::list();
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'GET') {
-            // ProductController::detail($matches[1]);
+             ProductController::detail($matches[1]);
         } else if ($uri === '/api/products' && $method === 'POST') {
             ProductController::create();
         } else if (preg_match('#^/api/products/(\d+)$#', $uri, $matches) && $method === 'PUT') {

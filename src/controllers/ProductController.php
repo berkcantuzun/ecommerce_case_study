@@ -57,4 +57,25 @@ class ProductController
             Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
         }
     }
+
+    public static function detail($id){
+        try {
+            $db = new Database();
+            $pdo = $db->getConnection();
+            $userId = Auth::userId();
+            if (!$userId) {
+                Response::json(false, 'Yetkisiz', null, [], 401);
+                return;
+            }
+            $productModel = new Product($pdo);
+            $product = $productModel->getById(['id' => $id]);
+            if (!$product) {
+                Response::json(false, 'Ürün bulunamadı', null, [], 404);
+                return;
+            }
+            Response::json(true, 'Ürün Bulundu', $product, [], 200);
+        } catch (\Exception $e) {
+            Response::json(false, 'Sunucu hatası', null, [$e->getMessage()], 500);
+        }
+    }
 }
