@@ -18,11 +18,13 @@ class Category
         $stmt = $this->pdo->prepare("INSERT INTO categories (name, description) VALUES (:name, :description)");
         return $stmt->execute($data);
     }
+
     public function getAll()
     {
         $stmt = $this->pdo->query("SELECT id, name, description,created_at,updated_at FROM categories");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
     public function update($data)
     {
         $fields = [];
@@ -39,10 +41,19 @@ class Category
         $stmt = $this->pdo->prepare("UPDATE categories SET $setClause WHERE id = :id");
         return $stmt->execute($data);
     }
+
     public function delete($data)
     {
         $stmt = $this->pdo->prepare("DELETE FROM categories WHERE id = :id");
         return $stmt->execute($data);
     }
+
+    public function getById($data)
+    {
+        $stmt = $this->pdo->prepare("SELECT id, name, description,created_at,updated_at FROM categories WHERE id=:id");
+        $stmt->execute($data);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
 
 }

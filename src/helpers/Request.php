@@ -27,14 +27,26 @@ class Request
                 }
                 if (strpos($r, 'min:') === 0) {
                     $min = (int)substr($r, 4);
-                    if (is_null($value) || !is_string($value) || strlen($value) < $min) {
-                        $errors[$field][] = "Minimum $min karakter olmalı";
+                    if (in_array('numeric', $ruleParts)) {
+                        if (!is_null($value) && $value < $min) {
+                            $errors[$field][] = "Minimum $min olmalı";
+                        }
+                    } else {
+                        if (is_null($value) || !is_string($value) || strlen($value) < $min) {
+                            $errors[$field][] = "Minimum $min karakter olmalı";
+                        }
                     }
                 }
                 if (strpos($r, 'max:') === 0) {
                     $max = (int)substr($r, 4);
-                    if (!is_null($value) && is_string($value) && strlen($value) > $max) {
-                        $errors[$field][] = "Maksimum $max karakter olmalı";
+                    if (in_array('numeric', $ruleParts)) {
+                        if (!is_null($value) && $value > $max) {
+                            $errors[$field][] = "Maksimum $max olmalı";
+                        }
+                    } else {
+                        if (!is_null($value) && is_string($value) && strlen($value) > $max) {
+                            $errors[$field][] = "Maksimum $max karakter olmalı";
+                        }
                     }
                 }
                 if ($r === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
